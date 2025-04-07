@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with ATLAS - Financor.AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .chat-container {
+            height: calc(100vh - 64px);
+        }
+        .messages-container {
+            height: calc(100vh - 180px);
+        }
+        .message {
+            max-width: 80%;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .user-message {
+            background: #E3F2FD;
+            border-radius: 20px 20px 5px 20px;
+        }
+        .atlas-message {
+            background: #1A237E;
+            color: white;
+            border-radius: 20px 20px 20px 5px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .typing-indicator {
+            display: inline-flex;
+            align-items: center;
+            margin: 0 0.5rem;
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            margin: 0 2px;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <span class="text-2xl font-bold text-blue-900">Financor<span class="text-blue-500">.AI</span></span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/dashboard" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Dashboard</a>
+                    <a href="/chat" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">Chat with ATLAS</a>
+                    <a href="/login" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Chat Interface -->
+    <div class="chat-container flex flex-col">
+        <!-- Chat Header -->
+        <div class="bg-white shadow-sm p-4">
+            <div class="max-w-4xl mx-auto flex items-center">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h2 class="text-lg font-semibold text-gray-900">ATLAS</h2>
+                        <p class="text-sm text-gray-500">Advanced Trading and Learning Analysis System</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="flex-1 overflow-y-auto bg-gray-50 messages-container" id="messages">
+            <div class="max-w-4xl mx-auto p-4 space-y-4">
+                <!-- Welcome Message -->
+                <div class="message atlas-message p-4">
+                    <p>Hello! I'm ATLAS, your Advanced Trading and Learning Analysis System. I'm here to help you with financial analysis, investment strategies, and personalized advice. How can I assist you today?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-white border-t">
+            <div class="max-w-4xl mx-auto p-4">
+                <form id="chat-form" class="flex space-x-4">
+                    <input type="text" 
+                           id="user-input" 
+                           class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Ask ATLAS anything about finance..."
+                           autocomplete="off">
+                    <button type="submit" 
+                            class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+                        <span>Send</span>
+                        <i class="fas fa-paper-plane ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const messagesContainer = document.getElementById('messages');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+
+            // Function to add a message to the chat
+            function addMessage(content, isUser = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message ml-auto' : 'atlas-message'} p-4`;
+                messageDiv.textContent = content;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'max-w-4xl mx-auto p-4 space-y-4';
+                wrapper.appendChild(messageDiv);
+                
+                messagesContainer.appendChild(wrapper);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            // Function to show typing indicator
+            function showTypingIndicator() {
+                const indicator = document.createElement('div');
+                indicator.className = 'message atlas-message p-4';
+                indicator.innerHTML = `
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'max-w-4xl mx-auto p-4 space-y-4';
+                wrapper.appendChild(indicator);
+                
+                messagesContainer.appendChild(wrapper);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                return wrapper;
+            }
+
+            // Handle form submission
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const message = userInput.value.trim();
+                if (!message) return;
+
+                // Add user message
+                addMessage(message, true);
+                userInput.value = '';
+
+                // Show typing indicator
+                const indicatorWrapper = showTypingIndicator();
+
+                try {
+                    // Send message to ATLAS
+                    const response = await fetch('/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+
+                    const data = await response.json();
+                    
+                    // Remove typing indicator
+                    indicatorWrapper.remove();
+
+                    // Add ATLAS response
+                    addMessage(data.response);
+                } catch (error) {
+                    console.error('Error:', error);
+                    indicatorWrapper.remove();
+                    addMessage('I apologize, but I encountered an error processing your request. Please try again.');
+                }
+            });
+
+            // Focus input on page load
+            userInput.focus();
+        });
+    </script>
+</body>
+</html>
